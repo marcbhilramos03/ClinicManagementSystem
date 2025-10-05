@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Patients')
+@section('title', 'Patients List')
 
 @section('content')
 <div class="container">
@@ -7,21 +7,22 @@
 
     <form method="GET" action="{{ route('clinic_staff.patients.index') }}" class="mb-3">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search patients..." value="{{ request('search') }}">
-            <button class="btn btn-outline-secondary">Search</button>
+            <input type="text" name="search" class="form-control" placeholder="Search by name..." value="{{ request('search') }}">
+            <button class="btn btn-outline-primary">Search</button>
         </div>
     </form>
 
     @if($patients->isEmpty())
         <div class="alert alert-info">No patients found.</div>
     @else
-        <table class="table table-bordered">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Name</th>
                     <th>ID</th>
                     <th>Email</th>
-                    <th>Actions</th>
+                    <th>Phone</th>
+                    <th>Address</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,15 +30,15 @@
                     @php
                         $pi = $patient->personalInformation;
                         $fullName = $pi ? ($pi->first_name.' '.$pi->last_name) : $patient->username;
+                        $phone = $pi ? $pi->phone : '-';
+                        $address = $pi ? $pi->address : '-';
                     @endphp
                     <tr>
                         <td>{{ $fullName }}</td>
                         <td>{{ $patient->username }}</td>
                         <td>{{ $patient->email }}</td>
-                        <td>
-                            <a href="{{ route('clinic_staff.patients.medical_record.create', $patient->id) }}" class="btn btn-sm btn-primary">Add Record</a>
-                            <a href="{{ route('clinic_staff.patients.vitals.create', $patient->id) }}" class="btn btn-sm btn-warning">Add Vitals</a>
-                        </td>
+                        <td>{{ $phone }}</td>
+                        <td>{{ $address }}</td>
                     </tr>
                 @endforeach
             </tbody>

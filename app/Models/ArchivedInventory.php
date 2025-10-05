@@ -10,29 +10,33 @@ class ArchivedInventory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'inventory_id',
         'name',
         'type',
         'quantity',
+        'condition',
         'expiration_date',
-        'status',    // expired, used, damaged, other
         'notes',
-        'staff_id',
-        'patient_id',
     ];
+    public function handle()
+{
+    $items = Inventory::where('expiration_date', '<', now())
+                      ->orWhere('condition', 'Used')
+                      ->get();
 
-    public function inventory()
-    {
-        return $this->belongsTo(Inventory::class);
+    foreach ($items as $item) {
+        ArchivedInventory::create([
+            'name' => $item->name,
+            'type' => $item->type,
+            'quantity' => $item->quantity,
+            'condition' => $item->condition ?? 'Expired',
+            'expiration_date' => $item->expiration_date,
+            'notes' => 'Automatically archived via scheduler',
+        ]);
+
+        $item->delete();
     }
 
-    public function staff()
-    {
-        return $this->belongsTo(User::class, 'staff_id');
-    }
+    $this->info('Inventory archived successfully.');
+}
 
-    public function patient()
-    {
-        return $this->belongsTo(User::class, 'patient_id');
-    }
 }

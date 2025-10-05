@@ -10,11 +10,16 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-    protected function schedule(Schedule $schedule): void
-    {
-        // ✅ Your scheduled task here
-        $schedule->command('inventory:move-expired')->daily();
-    }
+    // protected function schedule(Schedule $schedule): void
+    // {
+    //     // ✅ Your scheduled task here
+    //     $schedule->command('inventory:move-expired')->daily();
+    // }
+
+    protected function schedule(Schedule $schedule)
+{
+    $schedule->command('inventory:archive')->daily();
+}
 
     /**
      * Register the commands for the application.

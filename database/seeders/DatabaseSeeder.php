@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
         ]);
         $this->call([
           InventorySeeder::class,
+        ]);       
+        $this->call([
+          CheckupTypeSeeder::class,
         ]);
 
     }

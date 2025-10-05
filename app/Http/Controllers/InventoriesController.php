@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventories;
+use App\Models\ArchivedInventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -67,11 +68,24 @@ class InventoriesController extends Controller
         return back()->with('success', 'Inventory item updated!');
     }
 
-    // Delete inventory item
+    // Delete inventory item (with archiving)
     public function destroy($id)
     {
-        Inventories::destroy($id);
-        return back()->with('success', 'Inventory item deleted!');
+        $item = Inventories::findOrFail($id);
+
+        // Archive before deleting
+        ArchivedInventory::create([
+            'name' => $item->name,
+            'type' => $item->type,
+            'quantity' => $item->quantity,
+            'condition' => $item->condition ?? 'Deleted',
+            'expiration_date' => $item->expiration_date,
+            'notes' => 'Deleted by admin',
+        ]);
+
+        $item->delete();
+
+        return back()->with('success', 'Inventory item archived and deleted!');
     }
 
     // Show expired / archived items
@@ -89,15 +103,37 @@ class InventoriesController extends Controller
             ->whereDate('expiration_date', '<', $today)
             ->get();
 
+        // Archive expired medicines
+        foreach ($expiredMedicines as $med) {
+            ArchivedInventory::firstOrCreate([
+                'name' => $med->name,
+                'type' => $med->type,
+                'quantity' => $med->quantity,
+                'condition' => 'Expired',
+                'expiration_date' => $med->expiration_date,
+            ]);
+        }
+
+        // Archive expired equipment
+        foreach ($expiredEquipment as $eq) {
+            ArchivedInventory::firstOrCreate([
+                'name' => $eq->name,
+                'type' => $eq->type,
+                'quantity' => $eq->quantity,
+                'condition' => 'Expired',
+                'expiration_date' => $eq->expiration_date,
+            ]);
+        }
+
         return view('admin.inventory.archived', compact('expiredMedicines', 'expiredEquipment'));
     }
 
-public function indexForStaff()
-{
-    $medicines = Inventories::where('category', 'medicine')->get();
-    $equipments = Inventories::where('category', 'equipment')->get();
+    // Staff view of current inventory
+    public function indexForStaff()
+    {
+        $medicines = Inventories::where('category', 'medicine')->get();
+        $equipments = Inventories::where('category', 'equipment')->get();
 
-    // Return the existing inventory view
-    return view('clinic_staff.inventory', compact('medicines', 'equipments'));
-}
+        return view('clinic_staff.inventory', compact('medicines', 'equipments'));
+    }
 }

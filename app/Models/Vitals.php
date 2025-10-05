@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Vital extends Model
+class Vitals extends Model
 {
     use HasFactory;
 
@@ -24,5 +24,6 @@ class Vital extends Model
     {
         return $this->belongsTo(ClinicSession::class);
     }
+       public $timestamps = false;
 }
 

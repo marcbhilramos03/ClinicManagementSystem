@@ -57,31 +57,27 @@
                     ['route'=>'patient.appointments.index', 'icon'=>'fa-calendar', 'label'=>'Appointments'],
                     ['route'=>'patient.records', 'icon'=>'fa-notes-medical', 'label'=>'Medical Records'],
                 ],
-'clinic_staff' => [
-    ['route' => 'clinic_staff.dashboard', 'icon' => 'fa-home', 'label' => 'Dashboard'],
-
-    [
-        'label' => 'Patient Records',
-        'icon'  => 'fa-users',
-        'submenu' => [
-            ['route' => 'clinic_staff.patients.index', 'icon' => 'fa-list', 'label' => 'All Patients'],
-            ['route' => 'clinic_staff.patients.medical_record.create', 'icon' => 'fa-notes-medical', 'label' => 'Add Medical Record'],
-            ['route' => 'clinic_staff.patients.vitals.create', 'icon' => 'fa-heartbeat', 'label' => 'Add Vital'],
-        ],
-    ],
-
-    ['route' => 'clinic_staff.appointments', 'icon' => 'fa-calendar-check', 'label' => 'Appointments'],
-
-  [
-    'label' => 'Inventories',
-    'icon'  => 'fa-box',
-    'submenu' => [
-        ['route' => 'clinic_staff.inventories.medicine', 'icon' => 'fa-pills', 'label' => 'Medicines'],
-        ['route' => 'clinic_staff.inventories.equipment', 'icon' => 'fa-stethoscope', 'label' => 'Equipment'],
-    ],
-    ],
-    
+                'clinic_staff' => [
+                    ['route' => 'clinic_staff.dashboard', 'icon' => 'fa-home', 'label' => 'Dashboard'],
+                    [
+                        'label' => 'Patient Records',
+                        'icon'  => 'fa-users',
+                        'submenu' => [
+                            ['route' => 'clinic_staff.patients.index', 'icon' => 'fa-list', 'label' => 'All Patients'],
+                            ['route' => 'clinic_staff.patients.add_medical_record', 'icon' => 'fa-notes-medical', 'label' => 'Add Medical Record'],
+                            ['route' => 'clinic_staff.patients.add_vitals', 'icon' => 'fa-heartbeat', 'label' => 'Add Vitals'],
+                        ]
                     ],
+                    ['route' => 'clinic_staff.appointments', 'icon' => 'fa-calendar-check', 'label' => 'Appointments'],
+                    [
+                        'label' => 'Inventories',
+                        'icon'  => 'fa-box',
+                        'submenu' => [
+                            ['route' => 'clinic_staff.inventories.medicine', 'icon' => 'fa-pills', 'label' => 'Medicines'],
+                            ['route' => 'clinic_staff.inventories.equipment', 'icon' => 'fa-stethoscope', 'label' => 'Equipment'],
+                        ]
+                    ],
+                ],
                 'admin' => [
                     ['route'=>'admin.dashboard', 'icon'=>'fa-tachometer-alt', 'label'=>'Dashboard'],
                     ['route'=>'admin.manageUsers', 'icon'=>'fa-users', 'label'=>'Users'],
@@ -180,7 +176,7 @@
 
                 <!-- Profile Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link  d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <img class="img-profile rounded-circle me-2" src="{{ asset('images/profile.png') }}" style="width:40px; height:40px;">
                         <span class="d-none d-lg-inline text-gray-600 small">{{ $user->name }}</span>
                     </a>
@@ -239,7 +235,6 @@
     </div>
   </div>
 </div>
-
 
 <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>

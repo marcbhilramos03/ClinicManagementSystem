@@ -13,20 +13,31 @@ class PatientController extends Controller
     /**
      * Dashboard with summary counts
      */
-    public function dashboard()
-    {
-        $patientId = auth()->id();
+public function dashboard()
+{
+    $patient = auth()->user();
+    $departmentId = $patient->department_id;
+    $programId = $patient->program_id;
 
-        // Count appointments for this patient
-        $appointmentsCount = Appointment::where('patient_id', $patientId)->count();
+    // Next upcoming appointment (future appointments only)
+    $nextAppointment = Appointment::where(function ($query) use ($departmentId, $programId) {
+            if ($departmentId) {
+                $query->where('department_id', $departmentId);
+            }
+            if ($programId) {
+                $query->orWhere('program_id', $programId);
+            }
+        })
+        ->where('appointment_date', '>=', now())
+        ->orderBy('appointment_date', 'asc')
+        ->first();
 
-        // Count medical records via clinic session
-        $recordsCount = MedicalRecord::whereHas('clinicSession', function ($query) use ($patientId) {
-            $query->where('patient_id', $patientId);
-        })->count();
+    // Count medical records via clinic session
+    $recordsCount = MedicalRecord::whereHas('clinicSession', fn($q) => $q->where('patient_id', $patient->id))->count();
 
-        return view('patient.dashboard', compact('appointmentsCount', 'recordsCount'));
-    }
+    return view('patient.dashboard', compact('nextAppointment', 'recordsCount'));
+}
+
 
     /**
      * Show patient profile
@@ -49,12 +60,15 @@ class PatientController extends Controller
     {
         $patientId = auth()->id();
 
-        $records = MedicalRecord::whereHas('clinicSession', function ($query) use ($patientId) {
-            $query->where('patient_id', $patientId);
-        })
-        ->with(['clinicSession.staff.personalInformation'])
-        ->latest()
-        ->paginate(10);
+        $records = MedicalRecord::with([
+                'clinicSession.ClinicStaff.personalInformation',
+                'clinicSession.checkupType'
+            ])
+            ->join('clinic_sessions', 'medical_records.clinic_session_id', '=', 'clinic_sessions.id')
+            ->where('clinic_sessions.patient_id', $patientId)
+            ->orderByDesc('clinic_sessions.session_date')
+            ->select('medical_records.*') // important to keep MedicalRecord model
+            ->paginate(10);
 
         return view('patient.records', compact('records'));
     }
@@ -62,15 +76,30 @@ class PatientController extends Controller
     /**
      * Show appointments for patient
      */
-    public function myAppointments()
-    {
-        $patientId = auth()->id();
+     public function myAppointments()
+{
+    $patient = auth()->user();
 
-        $appointments = Appointment::with(['department', 'program', 'clinicStaff.personalInformation'])
-                                   ->where('patient_id', $patientId)
-                                   ->orderBy('appointment_date', 'desc')
-                                   ->get();
+    $departmentId = $patient->department_id;
+    $programId = $patient->program_id;
 
-        return view('patient.appointments', compact('appointments'));
-    }
+    $appointments = Appointment::with([
+        'department',
+        'program',
+        'clinicStaff.personalInformation'
+    ])
+    ->where(function ($query) use ($departmentId, $programId) {
+        if ($departmentId) {
+            $query->where('department_id', $departmentId);
+        }
+        if ($programId) {
+            $query->orWhere('program_id', $programId);
+        }
+    })
+    ->orderBy('appointment_date', 'desc')
+    ->paginate(10);
+
+    return view('patient.appointments', compact('appointments'));
+}
+
 }

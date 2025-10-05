@@ -45,5 +45,6 @@ class MedicalRecord extends Model
             'clinic_staff_id'
         );
     }
+       public $timestamps = false;
 }
 

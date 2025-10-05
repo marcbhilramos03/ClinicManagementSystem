@@ -46,8 +46,8 @@ Route::prefix('patient')->name('patient.')->middleware(['auth','role:patient','c
 
     // Appointments
     Route::get('/appointments', [PatientController::class, 'myAppointments'])->name('appointments.index');
-    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-    Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
+    // Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+    // Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
     // Records & Notifications
     Route::get('/records', [PatientController::class, 'records'])->name('records');
@@ -55,20 +55,16 @@ Route::prefix('patient')->name('patient.')->middleware(['auth','role:patient','c
 });
 
 
-
-
 Route::middleware(['auth', 'role:clinic_staff'])->prefix('clinic-staff')->name('clinic_staff.')->group(function () {
+
     // Dashboard
     Route::get('/dashboard', [ClinicStaffController::class, 'dashboard'])->name('dashboard');
 
-   // Profile view
+    // Profile
     Route::get('/profile', [ClinicStaffProfileController::class, 'profile'])->name('profile.view');
-
-    // Profile edit
     Route::get('/profile/edit', [ClinicStaffProfileController::class, 'edit'])->name('profile.edit');
-
-    // Profile update
     Route::put('/profile/update', [ClinicStaffProfileController::class, 'update'])->name('profile.update');
+
     // Appointments
     Route::get('/appointments', [ClinicStaffController::class, 'appointments'])->name('appointments');
     Route::patch('/appointments/{appointment}/status', [ClinicStaffController::class, 'updateAppointmentStatus'])->name('appointments.updateStatus');
@@ -78,17 +74,39 @@ Route::middleware(['auth', 'role:clinic_staff'])->prefix('clinic-staff')->name('
     Route::get('/inventories/medicine', [ClinicStaffController::class, 'medicineInventory'])->name('inventories.medicine');
     Route::get('/inventories/equipment', [ClinicStaffController::class, 'equipmentInventory'])->name('inventories.equipment');
 
-     // Patients
+    // -------------------------------
+    // Patients
+    // -------------------------------
+
+    // View all patients
     Route::get('/patients', [ClinicPatientController::class, 'index'])->name('patients.index');
 
-    // Medical Record
-    Route::get('/patients/medical-record/create', [ClinicPatientController::class, 'createMedicalRecord'])->name('patients.medical_record.create');
-    Route::post('/patients/medical-record', [ClinicPatientController::class, 'storeMedicalRecord'])->name('patients.medical_record.store');
+// -----------------------------
+// Medical Records
+// -----------------------------
 
-    // Vitals
-    Route::get('/patients/vitals/create', [ClinicPatientController::class, 'createVitals'])->name('patients.vitals.create');
-    Route::post('/patients/vitals', [ClinicPatientController::class, 'storeVitals'])->name('patients.vitals.store');
+// Show the single-page workflow (search/select/add)
+Route::get('/patients/medical-record/add', [ClinicPatientController::class, 'addMedicalRecord'])
+    ->name('patients.add_medical_record');
+
+// Store the medical record (form submit)
+Route::post('/patients/medical-record/store', [ClinicPatientController::class, 'medicalRecordStore'])
+    ->name('patients.medical_record.store');
+
+
+// -----------------------------
+// Vitals
+// -----------------------------
+
+// Show the single-page workflow (search/select/add)
+Route::get('/patients/vitals/add', [ClinicPatientController::class, 'addVitals'])
+    ->name('patients.add_vitals');
+
+// Store vitals (form submit)
+Route::post('/patients/vitals/store', [ClinicPatientController::class, 'vitalsStore'])
+    ->name('patients.vitals.store');
 });
+
 
 
 
@@ -116,5 +134,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group
         Route::put('/{id}', [InventoriesController::class, 'update'])->name('update');
         Route::delete('/{id}', [InventoriesController::class, 'destroy'])->name('destroy');
         Route::get('/archived', [InventoriesController::class, 'expired'])->name('archived');
+        Route::get('/admin/inventory/archive', [InventoryController::class, 'archiveExpired'])
+     ->name('admin.inventory.archive');
     });
 });

@@ -45,4 +45,5 @@ class ClinicSession extends Model
     {
         return $this->hasOne(Vital::class);
     }
+       public $timestamps = false;
 }

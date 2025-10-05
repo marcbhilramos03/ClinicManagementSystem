@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-public function settings()
-{
-    return view('admin.settings');
-}
+// public function settings()
+// {
+//     return view('admin.settings');
+// }
 public function profile()
 {
     return view('admin.profile');
@@ -38,25 +38,25 @@ public function updateProfile(Request $request)
     return redirect()->route('admin.profile')->with('success', 'Personal information updated!');
 }
 
-public function updateSettings(Request $request)
-{
-    $user = auth()->user();
+// public function updateSettings(Request $request)
+// {
+//     $user = auth()->user();
 
-    $request->validate([
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'password' => 'nullable|min:6|confirmed',
-    ]);
+//     $request->validate([
+//         'email' => 'required|email|unique:users,email,' . $user->id,
+//         'password' => 'nullable|min:6|confirmed',
+//     ]);
 
-    $user->email = $request->email;
+//     $user->email = $request->email;
 
-    if ($request->filled('password')) {
-        $user->password = bcrypt($request->password);
-    }
+//     if ($request->filled('password')) {
+//         $user->password = bcrypt($request->password);
+//     }
 
-    $user->save();
+//     $user->save();
 
-    return redirect()->route('admin.settings')->with('success', 'Settings updated successfully!');
-}
+//     return redirect()->route('admin.settings')->with('success', 'Settings updated successfully!');
+// }
     public function manageUsers()
     {
         $users = User::where('role', '!=', 'admin')->get();

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Models\Appointment;
 use App\Models\Inventories;
+use Illuminate\Http\Request;
+use App\Models\MedicalRecord;
 
 class ClinicStaffController extends Controller
 {
@@ -13,7 +15,29 @@ class ClinicStaffController extends Controller
     // =========================
     public function dashboard()
     {
-        return view('clinic_staff.dashboard');
+        $today = Carbon::today();
+
+        // Today's appointments (for this staff only or all, adjust if needed)
+        $appointments = Appointment::with(['patient.personalInformation', 'clinicStaff.personalInformation'])
+            ->whereDate('appointment_date', $today)
+            ->orderBy('appointment_date', 'asc')
+            ->get();
+
+     // Recent medical records ordered by clinic session date (latest first)
+    $medicalRecords = MedicalRecord::with([
+            'clinicSession.patient.personalInformation',
+            'clinicSession.checkupType'
+        ])
+        ->join('clinic_sessions', 'medical_records.clinic_session_id', '=', 'clinic_sessions.id')
+        ->orderByDesc('clinic_sessions.session_date')
+        ->select('medical_records.*')
+        ->limit(5) // show last 5 records
+        ->get();
+
+        // Inventory stock alerts
+        $inventory = Inventories::orderBy('quantity', 'asc')->get();
+
+        return view('clinic_staff.dashboard', compact('appointments', 'medicalRecords', 'inventory'));
     }
 
     // =========================

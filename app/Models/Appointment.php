@@ -11,11 +11,15 @@ class Appointment extends Model
         'clinic_staff_id',
         'department_id',
         'program_id',
-        'patient_id', // important
+        // 'patient_id', // important
         'appointment_date',
         'status',
         'notes',
     ];
+    protected $casts = [
+    'appointment_date' => 'datetime',
+    ];
+
 
     public function patient()
     {
